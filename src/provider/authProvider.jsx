@@ -10,7 +10,7 @@ const refreshAccessToken = async () => {
   if (!refreshToken) return null;
 
   try {
-    const res = await axios.get("http://localhost:8888/api/v1/auth/refresh-token", {
+    const res = await axios.get("/api/auth/refresh-token", {
       headers: { Authorization: `Bearer ${refreshToken}` },
     });
     const newAccessToken = res.data?.data?.accessToken;
@@ -55,7 +55,7 @@ const AuthProvider = ({ children }) => {
     const userId = decoded?.sub;
     setRole(decoded?.role || null);
     if (userId) {
-      const res = await axios.get(`http://localhost:8888/api/v1/users/${userId}`);
+      const res = await axios.get(`/api/users/${userId}`);
       const user = res.data?.data;
       console.log("✅ User data:", user); // <--- tambahkan ini juga
 

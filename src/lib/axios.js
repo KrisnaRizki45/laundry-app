@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // Contoh: http://localhost:8888/api/v1
+  baseURL: import.meta.env.VITE_API_URL, // /api
 });
 
 // ✅ Interceptor REQUEST: tambahkan access token di header sebelum request dikirim

@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../lib/axios"; // Ganti dari axios biasa
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-  const fetchUser = async () => {
+  const fetchData = async () => {
     try {
-      const id = localStorage.getItem('userId'); // Ambil userId dari localStorage
-      const res = await axios.get(`/api/v1/users/${id}`);
-      console.log("User:", res.data.data.user); // cek di console
-      setUsers(res.data.data.user); // langsung simpan 1 user
+      const res = await axiosInstance.get("/users");
+      console.log("All users response:", res.data);
+      const userList = res.data.data || [];
+      setUsers(userList);
     } catch (error) {
-      console.error("Gagal mengambil user:", error);
+      console.error("Error fetching users:", error);
     }
   };
 
-  fetchUser();
+  fetchData();
 }, []);
 
   const handleSearch = (e) => {
@@ -26,14 +26,14 @@ const UserList = () => {
   };
 
   const filteredUsers = users
-  .map((u) => ({
-    ...u,
-    status: "Active",         // ← dummy sementara agar tidak undefined
-    lastActive: "Today",      // ← dummy sementara agar muncul di UI
-  }))
-  .filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    .map((u) => ({
+      ...u,
+      status: "Active",
+      lastActive: "Today",
+    }))
+    .filter((user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <div className="flex flex-col flex-1 p-6 bg-white">
@@ -74,17 +74,20 @@ const UserList = () => {
         <table className="w-full border border-[#dbe1e6] rounded-xl overflow-hidden">
           <thead className="bg-white">
             <tr className="text-left text-[#111518] text-sm font-medium">
-              <th className="px-4 py-3 w-[400px]">Name</th>
-              <th className="px-4 py-3 w-[400px]">Role</th>
+              <th className="px-4 py-3 w-[400px]">Nama</th>
+              <th className="px-4 py-3 w-[400px]">Nama Pengguna</th>
+              <th className="px-4 py-3 w-[400px]">Email</th>
+              <th className="px-4 py-3 w-[400px]">Peran</th>
               <th className="px-4 py-3 w-70">Status</th>
-              <th className="px-4 py-3 w-[400px]">Last Active</th>
-              <th className="px-4 py-3 w-60 text-[#111518]">Actions</th>
+              <th className="px-4 py-3 w-60 text-[#111518]">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
               <tr key={user.id} className="border-t border-[#dbe1e6]">
                 <td className="px-4 py-2 text-sm text-[#111518]">{user.name}</td>
+                <td className="px-4 py-2 text-sm text-[#111518]">{user.username}</td>
+                <td className="px-4 py-2 text-sm text-[#111518]">{user.email}</td>
                 <td className="px-4 py-2 text-sm text-[#617689]">{user.role}</td>
                 <td className="px-4 py-2 text-sm">
                   <div className="flex justify-start mr-auto">
@@ -99,9 +102,6 @@ const UserList = () => {
                     </button>
                   </div>
                 </td>
-                <td className="px-4 py-2 text-sm text-[#617689]">
-                  {user.lastActive || "-"}
-                </td>
                 <td className="px-4 py-2 text-sm font-semibold">
                   <div className="flex items-center space-x-2">
                     <Link
@@ -109,6 +109,13 @@ const UserList = () => {
                       className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
                     >
                       View
+                    </Link>
+                    <span className="text-gray-400">|</span>
+                    <Link
+                      to={`/admin/users/Edit/${user.id}`}
+                      className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
+                    >
+                      Edit
                     </Link>
                     <span className="text-gray-400">|</span>
                     <Link

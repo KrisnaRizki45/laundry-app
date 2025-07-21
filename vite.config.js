@@ -10,10 +10,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8888',
+        target: 'http://localhost:8888', // arahkan ke backend-mu
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
-      },
-    },
-  },
+        // rewrite: path => path.replace(/^\/api/, '/api/v1'), // tambahkan prefix /api/v1
+      }
+    }
+  }
 });
