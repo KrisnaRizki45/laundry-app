@@ -65,7 +65,7 @@ const Routes = () => {
             { path: 'admin/users', element: <UserList /> },
             { path: 'admin/users/add', element: <AddUser /> },
             { path: 'admin/users/edit', element: <EditUser /> },
-            { path: 'admin/users/details/:userId', element: <UserDetails /> },
+            { path: 'admin/users/details/:id', element: <UserDetails /> },
           ],
         },
       ],
