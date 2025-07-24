@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import axiosInstance from "../../lib/axios"; // pastikan path ini sesuai
-// import Sidebar from "../../components/EmployeSidebar"; // aktifkan jika sidebar dipakai
+import { useParams } from "react-router-dom";
+import axiosInstance from "../../lib/axios";
 
 const UserDetails = () => {
   const { id } = useParams(); // ambil id dari URL
@@ -14,7 +13,7 @@ const UserDetails = () => {
     const fetchUser = async () => {
       try {
         const response = await axiosInstance.get(`/users/${id}`);
-        setUser(response.data); // sesuaikan jika response nested misal: response.data.data
+        setUser(response.data.data); // SESUAIKAN: ambil dari response.data.data
       } catch (err) {
         setError("Gagal mengambil data user.");
         console.error(err);
@@ -47,11 +46,12 @@ const UserDetails = () => {
         <section className="pt-4">
           <h3 className="text-lg font-bold text-[#111518] pb-2">Personal Information</h3>
           <div className="grid grid-cols-[20%_1fr] gap-x-6">
-            <InfoRow label="Name" value={user.id || "-"} />
+            <InfoRow label="ID" value={user.id || "-"} />
             <InfoRow label="Name" value={user.name || "-"} />
             <InfoRow label="Role" value={user.role || "-"} />
+            <InfoRow label="Username" value={user.username || "-"} />
             <InfoRow label="Email" value={user.email || "-"} />
-            <InfoRow label="Address" value={user.address || "-"} />
+            <InfoRow label="Address" value={user.address || "-"} /> {/* masih aman meskipun address tidak ada */}
           </div>
         </section>
 
@@ -60,17 +60,17 @@ const UserDetails = () => {
           <h3 className="text-lg font-bold text-[#111518] pb-2">Additional Information</h3>
           <div className="grid grid-cols-[20%_1fr] gap-x-6">
             <InfoRow label="Joined Date" value={formatDate(user.createdAt)} />
-            <InfoRow label="Last Login" value={formatDate(user.lastLogin)} />
+            <InfoRow label="Last Login" value={formatDate(user.updatedAt)} />
           </div>
         </section>
 
         {/* Action */}
         <div className="pt-6 text-right">
-          <Link to={`/admin/users/edit/${user.id}`}>
+          {/* <Link to={`/admin/users/edit/${user.id}`}>
             <button className="bg-[#197fe5] hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300">
               Edit User
             </button>
-          </Link>
+          </Link> */}
         </div>
       </main>
     </div>

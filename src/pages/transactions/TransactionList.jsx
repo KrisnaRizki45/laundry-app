@@ -1,68 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/EmployeSidebar";
-import axiosInstance from '../../lib/axios';
-
-const getStatusColor = (status) => {
-  const baseStyle =
-    "text-[14px] font-medium px-2 py-[2px] rounded text-center inline-block min-w-[4.5rem]";
-
-  if (status === "Completed")
-    return `${baseStyle} bg-green-100 text-green-700`;
-  if (status === "Pending")
-    return `${baseStyle} bg-yellow-100 text-yellow-700`;
-
-  return `${baseStyle} bg-gray-100 text-gray-600`;
-};
+import useTransaction from "../../hooks/useTransaction";
 
 const TransactionList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { transactions } = useTransaction();
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-
-  const [transactionsData, setTransactionData] = useState([
-    // { date: "2024-01-15", name: "Sophia Clark", amount: "$50.00", status: "Completed" },
-    // { date: "2024-01-16", name: "Ethan Miller", amount: "$75.00", status: "Pending" },
-    // { date: "2024-01-17", name: "Olivia Davis", amount: "$60.00", status: "Completed" },
-    // { date: "2024-01-18", name: "Liam Wilson", amount: "$45.00", status: "Completed" },
-  ]);
-
-  const filterTransactioData = () => {
-    setFilteredTransactions(
-      transactionsData.filter((tx) =>
-        tx.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }
-
-  const getTransactions = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await axiosInstance.get("/bills");
-      console.log("transactions fetched:", res.data.data);
-      // Set products state here if needed
-      setTransactionData(res.data.data); // Assuming res.data is an array of products
-    } catch (err) {
-      setError("Failed to fetch transactions.");
-      console.error("Failed to fetch transactions:", err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    getTransactions();
-  }, []);
+  const filteredTransactions = transactions.filter(
+    (tx) =>
+      tx.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      new Date(tx.billDate).toLocaleDateString("id-ID").includes(searchTerm)
+  );
 
   return (
     <div className="flex flex-col md:flex-row w-full font-sans">
-      {/* <Sidebar className="w-full md:w-64" /> */}
-
       <div className="flex-1 bg-white p-6">
         <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <h1 className="text-3xl font-bold text-gray-800">Transactions</h1>
@@ -103,45 +55,54 @@ const TransactionList = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Customer Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Quantity</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Total Amount</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {transactionsData.map((tx, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{tx.billDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.customer.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.billDetails[0].qty}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Rp {tx.billDetails[0].price * tx.billDetails[0].qty}</td>
-                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex items-center justify-center">
-                      <span className={getStatusColor(tx.status)}>{tx.status}</span>
-                    </div>
-                  </td> */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
-                    <div className="flex items-center space-x-2 text-sm font-semibold">
-                      <Link
-                        to={`details/${tx.billDetails[0].billId}`}
-                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
-                      >
-                        View
-                      </Link>
-                      <span className="text-gray-400">|</span>
-                      <Link
-                        to={`delete/${index}`}
-                        className="text-blue-500 hover:text-red-600 transition-colors duration-300"
-                      >
-                        Delete
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {transactionsData.length === 0 && (
+              {filteredTransactions.map((tx, index) => {
+                const totalAmount = tx.billDetails.reduce(
+                  (sum, item) => sum + item.qty * item.price,
+                  0
+                );
+
+                const formattedDate = new Date(tx.billDate).toLocaleDateString(
+                  "id-ID",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }
+                );
+
+                return (
+                  <tr key={tx.id || index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{formattedDate}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.customer.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Rp {totalAmount.toLocaleString("id-ID")}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
+                      <div className="flex items-center space-x-2 text-sm font-semibold">
+                        <Link
+                          to={`employe/transaction/details/${tx.id}`}
+                          className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
+                        >
+                          View
+                        </Link>
+                        <span className="text-gray-400">|</span>
+                        <Link
+                          to={`/transactions/delete/${tx.id}`}
+                          className="text-blue-500 hover:text-red-600 transition-colors duration-300"
+                        >
+                          Delete
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {transactions.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="text-center py-6 text-gray-500">
+                  <td colSpan="4" className="text-center py-6 text-gray-500">
                     No transactions found.
                   </td>
                 </tr>

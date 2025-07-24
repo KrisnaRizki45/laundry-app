@@ -1,32 +1,44 @@
-import React from "react";
-import { Link } from "react-router-dom";
-// import axiosInstance from '../lib/axios'; 
-import Sidebar from "../components/EmployeSidebar"; // Pastikan path ini sesuai
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import axiosInstance from '../lib/axios';
 
 const AdminDashboard = () => {
+  const [error, setError] = useState(null);
+  const [userCount, setUserCount] = useState(0); // untuk jumlah user  
+
+  // Fetch semua user untuk dihitung
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const res = await axiosInstance.get(`/users`);
+        const allUsers = res.data.data || [];
+        setUserCount(allUsers.length);
+      } catch (err) {
+        console.error("Gagal mengambil jumlah user:", err);
+      }
+    };
+    fetchAllUsers();
+  }, []);
+
+  if (error) return <p className="p-4 text-red-600">{error}</p>;
+
   return (
     <div className="flex w-full min-h-screen font-sans bg-white">
-      {/* Sidebar
-      <Sidebar /> */}
-
-      {/* Konten Utama */}
       <div className="flex-1 p-6">
-        {/* Judul */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-[#111418]">Dashboard</h1>
         </div>
 
-        {/* Kartu Info */}
+        {/* Kartu Jumlah User */}
         <div className="flex flex-wrap gap-4 mb-8">
-        <div className="flex min-w-[200px] max-w-[250px] flex-col gap-1 rounded-lg p-6 bg-[#f0f2f5]">
+          <div className="flex min-w-[200px] max-w-[250px] flex-col gap-1 rounded-lg p-6 bg-[#f0f2f5]">
             <p className="text-[#111418] text-base font-medium">User</p>
-            <p className="text-2xl font-bold text-[#111418]">120</p>
-        </div>
+            <p className="text-2xl font-bold text-[#111418]">{userCount}</p>
+          </div>
         </div>
 
-        {/* Tombol Navigasi */}
+        {/* Navigasi */}
         <div className="flex flex-col gap-4">
-          {/* Products */}
           <div className="flex flex-wrap gap-3">
             <Link
               to="/admin/users/add"
@@ -41,7 +53,6 @@ const AdminDashboard = () => {
               View Users
             </Link>
           </div>
-
         </div>
       </div>
     </div>
