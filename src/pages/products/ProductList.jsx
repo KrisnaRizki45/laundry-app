@@ -66,6 +66,7 @@ const ProductList = () => {
                 className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 text-gray-800 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
               />
             </div>
+
             <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded transition duration-300">
               <Link to="admin/products/add">Tambah Product</Link>
             </button>
@@ -90,10 +91,25 @@ const ProductList = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.type}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
                     <div className="flex items-center space-x-2 text-sm font-semibold">
-                      <button onClick={() => openModal(item)} className="text-blue-600 hover:underline">Detail</button>
+                      <button
+                        onClick={() => openModal(item)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Detail
+                      </button>
                       <span className="text-gray-400">|</span>
-                      <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700 transition-colors duration-300">Delete</button>
-                      <Link to={`/admin/products/edit/${item.id}`} className="text-blue-500 hover:text-blue-700 transition-colors duration-300">Edit</Link>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors duration-300"
+                      >
+                        Delete
+                      </button>
+                      <Link
+                        to={`/admin/products/edit/${item.id}`}
+                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
+                      >
+                        Edit
+                      </Link>
                     </div>
                   </td>
                 </tr>
@@ -109,7 +125,12 @@ const ProductList = () => {
           </table>
         </div>
       </div>
-      <ProductModal isOpen={isModalOpen} onClose={closeModal} product={selectedProduct} />
+
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        product={selectedProduct}
+      />
     </div>
   );
 };

@@ -9,7 +9,7 @@ const AddProduct = () => {
     name: "",
     description: "",
     price: "",
-    type: "kg",
+    type: "kg", // default
   });
 
   const [error, setError] = useState(null);
@@ -90,7 +90,7 @@ const AddProduct = () => {
               </select>
             </div>
 
-            {/* Error */}
+            {/* Error Message */}
             {error && <p className="text-red-600">{error}</p>}
 
             {/* Submit */}
