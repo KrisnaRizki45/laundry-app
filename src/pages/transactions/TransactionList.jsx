@@ -1,13 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/EmployeSidebar";
-
-const transactionsData = [
-  { date: "2024-01-15", name: "Sophia Clark", amount: "$50.00", status: "Completed" },
-  { date: "2024-01-16", name: "Ethan Miller", amount: "$75.00", status: "Pending" },
-  { date: "2024-01-17", name: "Olivia Davis", amount: "$60.00", status: "Completed" },
-  { date: "2024-01-18", name: "Liam Wilson", amount: "$45.00", status: "Completed" },
-];
+import axiosInstance from '../../lib/axios';
 
 const getStatusColor = (status) => {
   const baseStyle =
@@ -24,10 +18,46 @@ const getStatusColor = (status) => {
 const TransactionList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredTransactions = transactionsData.filter((tx) =>
-    tx.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tx.date.includes(searchTerm)
-  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+
+  const [transactionsData, setTransactionData] = useState([
+    // { date: "2024-01-15", name: "Sophia Clark", amount: "$50.00", status: "Completed" },
+    // { date: "2024-01-16", name: "Ethan Miller", amount: "$75.00", status: "Pending" },
+    // { date: "2024-01-17", name: "Olivia Davis", amount: "$60.00", status: "Completed" },
+    // { date: "2024-01-18", name: "Liam Wilson", amount: "$45.00", status: "Completed" },
+  ]);
+
+  const filterTransactioData = () => {
+    setFilteredTransactions(
+      transactionsData.filter((tx) =>
+        tx.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }
+
+  const getTransactions = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await axiosInstance.get("/bills");
+      console.log("transactions fetched:", res.data.data);
+      // Set products state here if needed
+      setTransactionData(res.data.data); // Assuming res.data is an array of products
+    } catch (err) {
+      setError("Failed to fetch transactions.");
+      console.error("Failed to fetch transactions:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getTransactions();
+  }, []);
 
   return (
     <div className="flex flex-col md:flex-row w-full font-sans">
@@ -73,33 +103,34 @@ const TransactionList = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Customer Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Quantity</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Total Amount</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredTransactions.map((tx, index) => (
+              {transactionsData.map((tx, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{tx.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.amount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{tx.billDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.customer.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.billDetails[0].qty}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Rp {tx.billDetails[0].price * tx.billDetails[0].qty}</td>
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex items-center justify-center">
                       <span className={getStatusColor(tx.status)}>{tx.status}</span>
                     </div>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
                     <div className="flex items-center space-x-2 text-sm font-semibold">
                       <Link
-                        to={`employe/transaction/details`}
+                        to={`details/${tx.billDetails[0].billId}`}
                         className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
                       >
                         View
                       </Link>
                       <span className="text-gray-400">|</span>
                       <Link
-                        to={`/transactions/delete/${index}`}
+                        to={`delete/${index}`}
                         className="text-blue-500 hover:text-red-600 transition-colors duration-300"
                       >
                         Delete
@@ -108,7 +139,7 @@ const TransactionList = () => {
                   </td>
                 </tr>
               ))}
-              {filteredTransactions.length === 0 && (
+              {transactionsData.length === 0 && (
                 <tr>
                   <td colSpan="5" className="text-center py-6 text-gray-500">
                     No transactions found.
