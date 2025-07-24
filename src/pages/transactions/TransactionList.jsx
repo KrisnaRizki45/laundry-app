@@ -66,20 +66,23 @@ const TransactionList = () => {
                   0
                 );
 
-                const formattedDate = new Date(tx.billDate).toLocaleDateString(
-                  "id-ID",
-                  {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  }
-                );
+                const formattedDate = new Date(tx.billDate).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                });
 
                 return (
                   <tr key={tx.id || index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{formattedDate}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.customer.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">Rp {totalAmount.toLocaleString("id-ID")}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                      {formattedDate}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {tx.customer.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      Rp {totalAmount.toLocaleString("id-ID")}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
                       <div className="flex items-center space-x-2 text-sm font-semibold">
                         <Link
