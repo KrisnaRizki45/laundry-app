@@ -1,58 +1,17 @@
 import React, { useState } from "react";
 import Sidebar from "../../components/EmployeSidebar";
 import { Link } from "react-router-dom";
+import useCustomers from "../../hooks/useCustomers";
 
 const CustomerList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-
-  const customers = [
-    {
-      name: "Andi Wijaya",
-      address: "Jl. Merdeka No. 1",
-      phone: "081234567890",
-      status: "Active",
-    },
-    {
-      name: "Budi Santoso",
-      address: "Jl. Asia Afrika No. 23",
-      phone: "082345678901",
-      status: "Inactive",
-    },
-    {
-      name: "Citra Lestari",
-      address: "Jl. Braga No. 45",
-      phone: "083456789012",
-      status: "Active",
-    },
-    {
-      name: "Dewi Kartika",
-      address: "Jl. Sudirman No. 78",
-      phone: "084567890123",
-      status: "Pending",
-    },
-    {
-      name: "Eka Putra",
-      address: "Jl. Gatot Subroto No. 99",
-      phone: "085678901234",
-      status: "Inactive",
-    },
-  ];
+  const { customers, deleteCustomer } = useCustomers(); 
 
   const filteredCustomers = customers.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
- const getStatusColor = (status) => {
-  const baseStyle =
-    "text-[14px] font-medium px-2 py-[2px] rounded text-center inline-block mx-auto min-w-[4.5rem]";
 
-  if (status === "Active")
-    return `${baseStyle} bg-green-100 text-green-700`;
-  if (status === "Inactive")
-    return `${baseStyle} bg-red-100 text-red-700`;
-
-  return `${baseStyle} bg-yellow-100 text-yellow-700`; // Pending atau lainnya
-};
 
   return (
     <div className="flex flex-col md:flex-row w-full font-sans">
@@ -102,7 +61,6 @@ const CustomerList = () => {
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Address</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Phone Number</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
               </tr>
             </thead>
@@ -111,15 +69,12 @@ const CustomerList = () => {
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{customer.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{customer.address}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{customer.phone}</td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm flex items-center justify-center ${getStatusColor(customer.status)}`}>
-                    {customer.status}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{customer.phoneNumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
                     <div className="flex items-center space-x-2 text-sm font-semibold">
                       <Link to="/customer/edit" className="text-blue-500 hover:text-blue-700 transition-colors duration-300">Edit</Link>
                       <span className="text-gray-400">|</span>
-                      <Link to="" className="text-blue-500 hover:text-red-600 transition-colors duration-300">Delete</Link>
+                      <button onClick={() => deleteCustomer(customer.id)} className="text-red-500 hover:text-red-700 transition-colors duration-300">Delete</button>
                     </div>
                   </td>
                 </tr>
