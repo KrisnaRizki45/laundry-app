@@ -5,7 +5,7 @@ import useCustomers from "../../hooks/useCustomers";
 
 const CustomerList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { customers } = useCustomers(); 
+  const { customers, deleteCustomer } = useCustomers(); 
 
   const filteredCustomers = customers.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,7 +74,7 @@ const CustomerList = () => {
                     <div className="flex items-center space-x-2 text-sm font-semibold">
                       <Link to="/customer/edit" className="text-blue-500 hover:text-blue-700 transition-colors duration-300">Edit</Link>
                       <span className="text-gray-400">|</span>
-                      <Link to="" className="text-blue-500 hover:text-red-600 transition-colors duration-300">Delete</Link>
+                      <button onClick={() => deleteCustomer(customer.id)} className="text-red-500 hover:text-red-700 transition-colors duration-300">Delete</button>
                     </div>
                   </td>
                 </tr>

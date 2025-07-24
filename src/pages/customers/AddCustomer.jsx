@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import Sidebar from "../../components/EmployeSidebar";
+import useCustomers from "../../hooks/useCustomers";
 
 const AddCustomer = () => {
   const [name, setName] = useState("");
-  const [contact, setContact] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [status, setStatus] = useState("Active");
+  const { createCustomer } = useCustomers();
 
   const handleSave = (e) => {
     e.preventDefault();
-    const customerData = { name, contact, address, status };
+    const customerData = { name, phoneNumber, address, status };
     console.log("Saving customer:", customerData);
+    createCustomer(customerData);
     // TODO: Kirim data ke backend
   };
 
@@ -44,8 +47,8 @@ const AddCustomer = () => {
               <input
                 type="text"
                 placeholder="Enter phone number"
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />

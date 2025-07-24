@@ -3,7 +3,6 @@ import useCustomers from "../../hooks/useCustomers";
 import useProducts from "../../hooks/useProduct";
 import useTransaction from "../../hooks/useTransaction";
 
-
 const AddTransaction = () => {
   const { customers, fetchCustomer } = useCustomers();
   const { products, fetchProduct } = useProducts();
@@ -25,12 +24,17 @@ const AddTransaction = () => {
     if (product) {
       setPrice(product.price || 0);
     }
-  }, [selectedProduct]);
+  }, [selectedProduct, products]);
 
   const handleAddItem = () => {
     if (!selectedProduct || !quantity || !price) return;
 
     const product = products.find((p) => p._id === selectedProduct);
+    if (!product) {
+      alert("Produk tidak ditemukan. Pastikan produk telah dipilih.");
+      return;
+    }
+
     const newItem = {
       productId: selectedProduct,
       name: product.name,
@@ -51,20 +55,29 @@ const AddTransaction = () => {
   const handleSubmit = async () => {
     if (!selectedCustomer || items.length === 0) return;
 
+    const userId = localStorage.getItem("userId") || "user-456"; // fallback default
+
     const payload = {
       customerId: selectedCustomer,
+      userId,
       billDetails: items.map(({ productId, qty }) => ({ productId, qty })),
     };
 
-    await createTransaction(payload);
-    setItems([]);
-    setSelectedCustomer("");
+    try {
+      await createTransaction(payload);
+      alert("Transaksi berhasil disimpan!");
+      setItems([]);
+      setSelectedCustomer("");
+    } catch (error) {
+      console.error("Gagal menyimpan transaksi:", error);
+      alert("Gagal menyimpan transaksi.");
+    }
   };
 
   return (
     <div className="flex justify-center p-6">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
-                <h1 className="text-2xl font-bold mb-6">Tambah Transaksi</h1>
+        <h1 className="text-2xl font-bold mb-6">Tambah Transaksi</h1>
 
         {/* Select Customer */}
         <div className="mb-4">
@@ -74,7 +87,9 @@ const AddTransaction = () => {
             value={selectedCustomer}
             onChange={(e) => setSelectedCustomer(e.target.value)}
           >
-            <option value="">-- Pilih Customer --</option>
+            <option key="placeholder-customer" value="">
+              -- Pilih Customer --
+            </option>
             {customers.map((customer) => (
               <option key={customer._id} value={customer._id}>
                 {customer.name}
@@ -91,7 +106,9 @@ const AddTransaction = () => {
             value={selectedProduct}
             onChange={(e) => setSelectedProduct(e.target.value)}
           >
-            <option value="">-- Pilih Produk --</option>
+            <option key="placeholder-product" value="">
+              -- Pilih Produk --
+            </option>
             {products.map((product) => (
               <option key={product._id} value={product._id}>
                 {product.name}
@@ -118,7 +135,8 @@ const AddTransaction = () => {
               type="number"
               className="w-full p-2 border rounded"
               value={price}
-              readOnly
+              onChange={(e) => setPrice(e.target.value)}
+              required
             />
           </div>
         </div>
@@ -148,7 +166,7 @@ const AddTransaction = () => {
               </thead>
               <tbody>
                 {items.map((item, index) => (
-                  <tr key={index}>
+                  <tr key={`${item.productId}-${index}`}>
                     <td className="border p-2">{item.name}</td>
                     <td className="border p-2 text-right">{item.qty}</td>
                     <td className="border p-2 text-right">
@@ -205,4 +223,3 @@ const AddTransaction = () => {
 };
 
 export default AddTransaction;
-

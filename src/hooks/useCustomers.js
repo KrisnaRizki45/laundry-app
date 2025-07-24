@@ -18,6 +18,30 @@ const useCustomers = () => {
     }
   };
 
+  const createCustomer = async (customerData) => {
+    setStatus("loading");
+    try {
+      const response = await axiosInstance.post("/customers", customerData);
+      setCustomers((prev) => [...prev, response.data]);
+      setStatus("success");
+    } catch (err) {
+      setError(err);
+      setStatus("error");
+    }
+  };
+
+  const deleteCustomer = async (customerId) => {
+    setStatus("loading");
+    try {
+      await axiosInstance.delete(`/customers/${customerId}`);
+      setCustomers((prev) => prev.filter((customer) => customer.id !== customerId));
+      setStatus("success");
+    } catch (err) {
+      setError(err);
+      setStatus("error");
+    }
+  };
+
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -27,6 +51,8 @@ const useCustomers = () => {
     status,
     error,
     fetchCustomer: fetchCustomers,
+    createCustomer,
+    deleteCustomer,
   };
 };
 
