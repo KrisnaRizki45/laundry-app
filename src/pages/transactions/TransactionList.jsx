@@ -1,32 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/EmployeSidebar";
-
-const transactionsData = [
-  { date: "2024-01-15", name: "Sophia Clark", amount: "$50.00", status: "Completed" },
-  { date: "2024-01-16", name: "Ethan Miller", amount: "$75.00", status: "Pending" },
-  { date: "2024-01-17", name: "Olivia Davis", amount: "$60.00", status: "Completed" },
-  { date: "2024-01-18", name: "Liam Wilson", amount: "$45.00", status: "Completed" },
-];
-
-const getStatusColor = (status) => {
-  const baseStyle =
-    "text-[14px] font-medium px-2 py-[2px] rounded text-center inline-block min-w-[4.5rem]";
-
-  if (status === "Completed")
-    return `${baseStyle} bg-green-100 text-green-700`;
-  if (status === "Pending")
-    return `${baseStyle} bg-yellow-100 text-yellow-700`;
-
-  return `${baseStyle} bg-gray-100 text-gray-600`;
-};
+import useTransaction from "../../hooks/useTransaction";
 
 const TransactionList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { transactions } = useTransaction();
+  console.log(transactions);
 
-  const filteredTransactions = transactionsData.filter((tx) =>
-    tx.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tx.date.includes(searchTerm)
+  const filteredTransactions = transactions.filter(
+    (tx) =>
+      tx.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      new Date(tx.billDate).toLocaleDateString("id-ID").includes(searchTerm)
   );
 
   return (
@@ -71,44 +56,68 @@ const TransactionList = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Customer Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Customer Name
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredTransactions.map((tx, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{tx.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.amount}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex items-center justify-center">
-                      <span className={getStatusColor(tx.status)}>{tx.status}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
-                    <div className="flex items-center space-x-2 text-sm font-semibold">
-                      <Link
-                        to={`employe/transaction/details`}
-                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
-                      >
-                        View
-                      </Link>
-                      <span className="text-gray-400">|</span>
-                      <Link
-                        to={`/transactions/delete/${index}`}
-                        className="text-blue-500 hover:text-red-600 transition-colors duration-300"
-                      >
-                        Delete
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {filteredTransactions.length === 0 && (
+              {filteredTransactions.map((tx, index) => {
+                const totalAmount = tx.billDetails.reduce(
+                  (sum, item) => sum + item.qty * item.price,
+                  0
+                );
+
+                const formattedDate = new Date(tx.billDate).toLocaleDateString(
+                  "id-ID",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }
+                );
+
+                return (
+                  <tr key={tx.id || index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                      {formattedDate}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {tx.customer.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      Rp {totalAmount.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
+                      <div className="flex items-center space-x-2 text-sm font-semibold">
+                        <Link
+                          to={`employe/transaction/details/${tx.id}`}
+                          className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
+                        >
+                          View
+                        </Link>
+                        <span className="text-gray-400">|</span>
+                        <Link
+                          to={`/transactions/delete/${tx.id}`}
+                          className="text-blue-500 hover:text-red-600 transition-colors duration-300"
+                        >
+                          Delete
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {transactions.length === 0 && (
                 <tr>
                   <td colSpan="5" className="text-center py-6 text-gray-500">
                     No transactions found.

@@ -54,7 +54,9 @@ const Register = () => {
 
   return (
     <div className="max-w-sm w-full p-3">
-      <h1 className="text-3xl text-white font-bold text-center mb-6">Register</h1>
+      <h1 className="text-3xl text-white font-bold text-center mb-6">
+        Register
+      </h1>
       <form onSubmit={handleSubmit}>
         {/* Name */}
         <div className="relative mb-6">
@@ -165,12 +167,20 @@ const Register = () => {
         <div className="relative mb-6">
           <select
             id="role"
+            required
             value={formData.role}
             onChange={handleChange}
             className="block w-full py-2.5 px-3 text-sm text-white bg-transparent border border-gray-400 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            <option value="admin" className="text-black">Admin</option>
-            <option value="employee" className="text-black">Employee</option>
+            <option value="" disabled hidden>
+              Pilih Role
+            </option>
+            <option value="admin" className="text-black">
+              Admin
+            </option>
+            <option value="employee" className="text-black">
+              Employee
+            </option>
           </select>
           <label
             htmlFor="role"
