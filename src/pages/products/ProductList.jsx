@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import useProducts from "../../hooks/useProduct";
 import ProductModal from "./ProductModal";
 
+
 const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { products, deleteProduct } = useProducts();
@@ -20,24 +21,27 @@ const ProductList = () => {
     setIsModalOpen(false);
   };
 
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Yakin ingin menghapus produk ini?");
     if (!confirmDelete) return;
 
     try {
-      await deleteProduct(id);
+      await deleteProduct(id); // ✅ Hapus berdasarkan id
     } catch (error) {
       alert("Gagal menghapus produk. Silakan coba lagi.");
       console.error("Delete error:", error);
     }
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="flex flex-col md:flex-row w-full font-sans">
+      {/* <Sidebar className="w-full md:w-64" /> */}
+
+      {/* Konten Kanan */}
       <div className="flex-1 bg-white p-6">
         <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <h1 className="text-3xl font-bold text-gray-800">Products</h1>
@@ -79,18 +83,32 @@ const ProductList = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Price</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Type</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Price
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Type
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredProducts.map((item) => (
                 <tr key={item.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{item.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.price}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.type}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                    {item.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {item.price}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {item.type}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600">
                     <div className="flex items-center space-x-2 text-sm font-semibold">
                       <button
@@ -106,12 +124,8 @@ const ProductList = () => {
                       >
                         Delete
                       </button>
-                      <Link
-                        to={`/admin/products/edit/${item.id}`}
-                        className="text-blue-500 hover:text-blue-700 transition-colors duration-300"
-                      >
-                        Edit
-                      </Link>
+                      <Link to={`/admin/products/edit/${item.id}`} className="text-blue-500 hover:text-blue-700 transition-colors duration-300">Edit</Link>
+
                     </div>
                   </td>
                 </tr>
@@ -127,7 +141,6 @@ const ProductList = () => {
           </table>
         </div>
       </div>
-
       <ProductModal
         isOpen={isModalOpen}
         onClose={closeModal}

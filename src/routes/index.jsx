@@ -29,6 +29,7 @@ import EmployeLayout from "../components/EmployeLayout";
 
 import Unauthorized from "../pages/Unauthorized";
 
+
 const Routes = () => {
   const { token, role } = useAuth();
 
@@ -67,7 +68,7 @@ const Routes = () => {
             { path: "admin/dashboard", element: <AdminDashboard /> },
             { path: "admin/users", element: <UserList /> },
             { path: "admin/users/add", element: <AddUser /> },
-            { path: "admin/users/edit/:id", element: <EditUser /> },
+            { path: "admin/users/edit", element: <EditUser /> },
             { path: "admin/users/details/:id", element: <UserDetails /> },
             { path: "admin/products", element: <ProductList /> },
             { path: "admin/products/add", element: <AddProduct /> },
@@ -75,7 +76,10 @@ const Routes = () => {
             { path: "admin/customer", element: <CustomerList /> },
             { path: "admin/customer/add", element: <AddCustomer /> },
             { path: "admin/transaction", element: <TransactionList /> },
-            { path: "admin/transaction/details/:id", element: <TransactionDetails /> },
+            {
+              path: "admin/transaction/details",
+              element: <TransactionDetails />,
+            },
             { path: "admin/transaction/add", element: <AddTransaction /> },
           ],
         },
@@ -92,15 +96,7 @@ const Routes = () => {
           element: <EmployeLayout />,
           children: [
             { path: "employe/dashboard", element: <EmployeDashboard /> },
-            { path: "employe/products", element: <ProductList /> },
-            { path: "employe/products/add", element: <AddProduct /> },
-            { path: "employe/products/edit/:id", element: <EditProduct /> },
-            { path: "employe/customer", element: <CustomerList /> },
-            { path: "employe/customer/add", element: <AddCustomer /> },
-            { path: "employe/customer/edit/:id", element: <EditCustomer /> },
-            { path: "employe/transaction", element: <TransactionList /> },
-            { path: "employe/transaction/details/:id", element: <TransactionDetails /> },
-            { path: "employe/transaction/add", element: <AddTransaction /> },
+            
           ],
         },
       ],

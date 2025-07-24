@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/EmployeSidebar";
 import useTransaction from "../../hooks/useTransaction";
@@ -6,6 +6,7 @@ import useTransaction from "../../hooks/useTransaction";
 const TransactionList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { transactions } = useTransaction();
+  console.log(transactions);
 
   const filteredTransactions = transactions.filter(
     (tx) =>
@@ -15,6 +16,8 @@ const TransactionList = () => {
 
   return (
     <div className="flex flex-col md:flex-row w-full font-sans">
+      {/* <Sidebar className="w-full md:w-64" /> */}
+
       <div className="flex-1 bg-white p-6">
         <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
           <h1 className="text-3xl font-bold text-gray-800">Transactions</h1>
@@ -53,10 +56,18 @@ const TransactionList = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Date</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Customer Name</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Amount</th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Customer Name
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -66,11 +77,14 @@ const TransactionList = () => {
                   0
                 );
 
-                const formattedDate = new Date(tx.billDate).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                });
+                const formattedDate = new Date(tx.billDate).toLocaleDateString(
+                  "id-ID",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }
+                );
 
                 return (
                   <tr key={tx.id || index}>
@@ -105,7 +119,7 @@ const TransactionList = () => {
               })}
               {transactions.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="text-center py-6 text-gray-500">
+                  <td colSpan="5" className="text-center py-6 text-gray-500">
                     No transactions found.
                   </td>
                 </tr>
