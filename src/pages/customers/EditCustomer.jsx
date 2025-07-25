@@ -57,9 +57,14 @@ const EditCustomer = () => {
         <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
           {/* Breadcrumb */}
           <div className="text-sm text-gray-500 mb-4">
-            <Link to="/employe/customers" className="hover:underline text-blue-600">Customers</Link>
+            <span
+              className="hover:underline cursor-pointer"
+              onClick={() => navigate("/employe/products")}
+            >
+              Customers
+            </span>{" "}
             <span className="mx-1">/</span>
-            <span className="text-gray-800 font-semibold">Edit</span>
+            <span className="text-gray-800 font-semibold">Edit Customer</span>
           </div>
 
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Customer</h1>
@@ -111,7 +116,7 @@ const EditCustomer = () => {
           {/* Buttons */}
           <div className="flex justify-end mt-6">
             <button
-              onClick={() => navigate("/employe/customers")}
+              onClick={() => navigate("/employe/customer")}
               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 m-1 rounded-lg transition-all duration-300"
             >
               Back

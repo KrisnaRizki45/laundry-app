@@ -37,7 +37,7 @@ const Login = () => {
 
       console.log("Full login response:", res.data);
       const accessToken = res.data.data.token;
-      const refreshToken = res.data.data.refreshToken;
+      const refreshToken = res.data.data.refresh_token;
 
       // Simpan Token
       localStorage.setItem("access_token", accessToken);

@@ -17,7 +17,7 @@ import { useAuth } from '../provider/authProvider'; // 🔥 Import auth context
 const EmployeSidebar = () => {
   const [open, setOpen] = useState(true);
   const [expandedMenu, setExpandedMenu] = useState(null);
-  const { setToken } = useAuth(); // 🔥 Ambil setToken untuk logout
+  const { setToken, userInfo } = useAuth();
 
   const handleToggleSidebar = () => setOpen(!open);
   const handleToggleSubmenu = (label) => {
@@ -153,8 +153,12 @@ const EmployeSidebar = () => {
       <div className="flex items-center gap-3 p-2 border-t border-white/20 mt-auto">
         <FaUserCircle size={28} />
         <div className={`transition-all duration-300 ${!open ? 'opacity-0 w-0' : 'opacity-100 w-full'}`}>
-          <p className="text-sm font-semibold">User</p>
-          <p className="text-xs text-white/80">user@example.com</p>
+          <p className="text-sm font-semibold truncate">
+            {userInfo?.name || "User"}
+          </p>
+          <p className="text-xs text-white/80 truncate">
+            {userInfo?.email || "user@example.com"}
+          </p>
         </div>
       </div>
     </nav>

@@ -65,7 +65,7 @@ const EditProduct = () => {
           <div className="text-sm text-gray-500 mb-4">
             <span
               className="hover:underline cursor-pointer"
-              onClick={() => navigate("/admin/products")}
+              onClick={() => navigate("/employe/products")}
             >
               Products
             </span>{" "}
@@ -125,6 +125,13 @@ const EditProduct = () => {
 
             {/* Submit */}
             <div className="text-right">
+              <button
+              onClick={() => navigate("/employe/products")}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 m-1 rounded-lg transition-all duration-300"
+            >
+              Back
+            </button>
+
               <button
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"

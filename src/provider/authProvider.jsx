@@ -10,10 +10,13 @@ const refreshAccessToken = async () => {
   if (!refreshToken) return null;
 
   try {
-    const res = await axios.get("/api/auth/refresh-token", {
-      headers: { Authorization: `Bearer ${refreshToken}` },
+    const res = await axios.get("/api/v1/auth/refresh-token", {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
     });
-    const newAccessToken = res.data?.data?.accessToken;
+
+    const newAccessToken = res.data?.data?.token;
     if (newAccessToken) {
       localStorage.setItem("access_token", newAccessToken);
       axios.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
@@ -22,6 +25,7 @@ const refreshAccessToken = async () => {
       throw new Error("Access token baru tidak ditemukan");
     }
   } catch (err) {
+    console.error("❌ Refresh token error:", err.message);
     localStorage.clear();
     window.location.href = "/";
     return null;
@@ -48,37 +52,51 @@ const AuthProvider = ({ children }) => {
   };
 
   const fetchUserInfo = async (accessToken) => {
-  try {
-    const decoded = jwtDecode(accessToken);
-    console.log("🔍 Token decoded:", decoded); // <--- tambahkan ini
+    try {
+      const decoded = jwtDecode(accessToken);
+      console.log("🔍 Token decoded:", decoded);
 
-    const userId = decoded?.sub;
-    setRole(decoded?.role || null);
-    if (userId) {
-      const res = await axios.get(`/api/users/${userId}`);
-      const user = res.data?.data;
-      console.log("✅ User data:", user); // <--- tambahkan ini juga
+      const userId = decoded?.sub;
+      setRole(decoded?.role || null);
 
-      setUserInfo({
-        name: user?.name || "User",
-        email: user?.email || "user@example.com",
-      });
+      if (userId) {
+        const res = await axios.get(`/api/users/${userId}`);
+        const user = res.data?.data;
+        console.log("✅ User data:", user);
+
+        setUserInfo({
+          name: user?.name || "User",
+          email: user?.email || "user@example.com",
+        });
+      }
+    } catch (err) {
+      console.error("Gagal fetch user:", err.message);
+      setUserInfo({ name: "", email: "" });
     }
-  } catch (err) {
-    console.error("Gagal fetch user:", err.message);
-    setUserInfo({ name: "", email: "" });
-  }
-};
+  };
 
   useEffect(() => {
-    setInitialized(true);
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      fetchUserInfo(token);
-    } else {
-      delete axios.defaults.headers.common["Authorization"];
-    }
-  }, [token]);
+    const init = async () => {
+      let accessToken = token;
+
+      // Jika tidak ada access token tapi ada refresh token, ambil token baru
+      if (!accessToken && localStorage.getItem("refresh_token")) {
+        accessToken = await refreshAccessToken();
+        setToken_(accessToken); // jangan panggil setToken() di sini untuk hindari fetchUserInfo dua kali
+      }
+
+      if (accessToken) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+        fetchUserInfo(accessToken);
+      } else {
+        delete axios.defaults.headers.common["Authorization"];
+      }
+
+      setInitialized(true);
+    };
+
+    init();
+  }, []);
 
   const contextValue = useMemo(
     () => ({ token, role, userInfo, setToken }),
@@ -87,7 +105,11 @@ const AuthProvider = ({ children }) => {
 
   if (!initialized) return null;
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);

@@ -15,15 +15,12 @@ import TransactionDetails from './pages/transactions/TransactionDetails';
 import AddTransaction from './pages/transactions/AddTransaction';
 import AuthProvider from "./provider/authProvider";
 import Routes from './routes';
-import { HeroUIProvider } from '@heroui/react';
 
 function App() {
   return (
-    <HeroUIProvider>
       <AuthProvider>
         <Routes />
       </AuthProvider>
-    </HeroUIProvider>
   );
 }
 
