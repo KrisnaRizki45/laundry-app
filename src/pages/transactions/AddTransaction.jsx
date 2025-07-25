@@ -1,223 +1,186 @@
 import React, { useEffect, useState } from "react";
-import useCustomers from "../../hooks/useCustomers";
-import useProducts from "../../hooks/useProduct";
-import useTransaction from "../../hooks/useTransaction";
+import axiosInstance from "../../lib/axios"; // pastikan path sesuai
+import { useNavigate } from "react-router-dom";
+// import Sidebar from "../../components/EmployeSidebar";
 
 const AddTransaction = () => {
-  const { customers, fetchCustomer } = useCustomers();
-  const { products, fetchProduct } = useProducts();
-  const { createTransaction } = useTransaction();
-
+  const [customers, setCustomers] = useState([]);
+  const [products, setProducts] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [price, setPrice] = useState("");
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
+  // Fetch customers & products
   useEffect(() => {
-    fetchCustomer();
-    fetchProduct();
+    const fetchData = async () => {
+      try {
+        const customerRes = await axiosInstance.get("/customers");
+        const productRes = await axiosInstance.get("/products");
+        setCustomers(customerRes.data.data || []);
+        setProducts(productRes.data.data || []);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    const product = products.find((p) => p._id === selectedProduct);
-    if (product) {
-      setPrice(product.price || 0);
-    }
-  }, [selectedProduct, products]);
-
   const handleAddItem = () => {
-    if (!selectedProduct || !quantity || !price) return;
-
-    const product = products.find((p) => p._id === selectedProduct);
-    if (!product) {
-      alert("Produk tidak ditemukan. Pastikan produk telah dipilih.");
-      return;
-    }
-
+    if (!selectedProduct || quantity <= 0) return;
+    const product = products.find((p) => p.id === selectedProduct);
     const newItem = {
-      productId: selectedProduct,
-      name: product.name,
+      product,
       qty: parseInt(quantity),
-      price: parseFloat(price),
+      price: product.price,
     };
-
-    setItems((prev) => [...prev, newItem]);
+    setItems([...items, newItem]);
     setSelectedProduct("");
     setQuantity(1);
-    setPrice("");
   };
-
-  const subtotal = items.reduce((acc, item) => acc + item.qty * item.price, 0);
-  const tax = subtotal * 0.05;
-  const total = subtotal + tax;
 
   const handleSubmit = async () => {
-    if (!selectedCustomer || items.length === 0) return;
+  if (!selectedCustomer || items.length === 0) return;
 
-    const userId = localStorage.getItem("userId") || "user-456"; // fallback default
-
-    const payload = {
-      customerId: selectedCustomer,
-      userId,
-      billDetails: items.map(({ productId, qty }) => ({ productId, qty })),
-    };
-
-    try {
-      await createTransaction(payload);
-      alert("Transaksi berhasil disimpan!");
-      setItems([]);
-      setSelectedCustomer("");
-    } catch (error) {
-      console.error("Gagal menyimpan transaksi:", error);
-      alert("Gagal menyimpan transaksi.");
-    }
+  const payload = {
+    customerId: selectedCustomer,
+    billDetails: items.map((item) => ({
+      product: {
+        id: item.product.id,
+      },
+      qty: item.qty,
+    })),
   };
 
+  try {
+    setLoading(true);
+    console.log("Submitting payload:", JSON.stringify(payload, null, 2));
+    const res = await axiosInstance.post("/bills", payload);
+    alert("Transaction Created!");
+    console.log("Created Bill:", res.data);
+    navigate("/employe/transaction");
+  } catch (err) {
+    console.error("Create error:", err.response?.data || err.message);
+    alert("Failed to create transaction.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const total = items.reduce((acc, item) => acc + item.qty * item.price, 0);
+
   return (
-    <div className="flex justify-center p-6">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
-        <h1 className="text-2xl font-bold mb-6">Tambah Transaksi</h1>
+    <div className="flex flex-col md:flex-row min-h-screen font-sans">
+      {/* <Sidebar className="w-full md:w-64" /> */}
 
-        {/* Select Customer */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Pilih Customer</label>
-          <select
-            className="w-full p-2 border rounded"
-            value={selectedCustomer}
-            onChange={(e) => setSelectedCustomer(e.target.value)}
-          >
-            <option key="placeholder-customer" value="">
-              -- Pilih Customer --
-            </option>
-            {customers.map((customer) => (
-              <option key={customer._id} value={customer._id}>
-                {customer.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <main className="flex-1 bg-gray-50 p-6 flex justify-center items-start">
+        <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">Create Transaction</h1>
 
-        {/* Select Product */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Pilih Produk</label>
-          <select
-            className="w-full p-2 border rounded"
-            value={selectedProduct}
-            onChange={(e) => setSelectedProduct(e.target.value)}
-          >
-            <option key="placeholder-product" value="">
-              -- Pilih Produk --
-            </option>
-            {products.map((product) => (
-              <option key={product._id} value={product._id}>
-                {product.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Quantity & Price */}
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1">
-            <label className="block mb-1 font-medium">Jumlah</label>
-            <input
-              type="number"
-              className="w-full p-2 border rounded"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
+          {/* Customer */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Customer</label>
+            <select
+              value={selectedCustomer}
+              onChange={(e) => setSelectedCustomer(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Customer</option>
+              {customers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} - {c.phoneNumber}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="flex-1">
-            <label className="block mb-1 font-medium">Harga</label>
-            <input
-              type="number"
-              className="w-full p-2 border rounded"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-            />
-          </div>
-        </div>
 
-        {/* Add Item Button */}
-        <div className="mb-6">
+          {/* Add Item */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Product</label>
+              <select
+                value={selectedProduct}
+                onChange={(e) => setSelectedProduct(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Product</option>
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} - Rp{p.price.toLocaleString("id-ID")}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Quantity</label>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
           <button
             onClick={handleAddItem}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="mb-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded transition"
           >
-            Tambah Item
+            Add Item
           </button>
-        </div>
 
-        {/* List of Items */}
-        {items.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Daftar Item</h2>
-            <table className="w-full border text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border p-2 text-left">Produk</th>
-                  <th className="border p-2 text-right">Qty</th>
-                  <th className="border p-2 text-right">Harga</th>
-                  <th className="border p-2 text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={`${item.productId}-${index}`}>
-                    <td className="border p-2">{item.name}</td>
-                    <td className="border p-2 text-right">{item.qty}</td>
-                    <td className="border p-2 text-right">
-                      Rp {item.price.toLocaleString("id-ID")}
-                    </td>
-                    <td className="border p-2 text-right">
-                      Rp {(item.qty * item.price).toLocaleString("id-ID")}
-                    </td>
+          {/* Items Table */}
+          {items.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">Items</h2>
+              <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="text-left px-4 py-2 text-gray-700">Item</th>
+                    <th className="text-left px-4 py-2 text-gray-700">Quantity</th>
+                    <th className="text-left px-4 py-2 text-gray-700">Price</th>
+                    <th className="text-left px-4 py-2 text-gray-700">Subtotal</th>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr className="bg-gray-50 font-semibold">
-                  <td className="border p-2 text-right" colSpan={3}>
-                    Subtotal
-                  </td>
-                  <td className="border p-2 text-right">
-                    Rp {subtotal.toLocaleString("id-ID")}
-                  </td>
-                </tr>
-                <tr className="bg-gray-50 font-semibold">
-                  <td className="border p-2 text-right" colSpan={3}>
-                    Pajak (5%)
-                  </td>
-                  <td className="border p-2 text-right">
-                    Rp {tax.toLocaleString("id-ID")}
-                  </td>
-                </tr>
-                <tr className="bg-gray-100 font-bold">
-                  <td className="border p-2 text-right" colSpan={3}>
-                    Total
-                  </td>
-                  <td className="border p-2 text-right">
-                    Rp {total.toLocaleString("id-ID")}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {items.map((item, i) => (
+                    <tr key={i} className="border-t">
+                      <td className="px-4 py-2 text-gray-800">{item.product.name}</td>
+                      <td className="px-4 py-2 text-gray-600">{item.qty}</td>
+                      <td className="px-4 py-2 text-gray-600">Rp{item.price.toLocaleString("id-ID")}</td>
+                      <td className="px-4 py-2 text-gray-600">
+                        Rp{(item.qty * item.price).toLocaleString("id-ID")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-        {/* Submit Button */}
-        <div className="text-right">
-          <button
-            onClick={handleSubmit}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Simpan Transaksi
-          </button>
+          {/* Summary */}
+          <div className="mb-6 space-y-2">
+            <div className="flex justify-between font-bold text-base text-gray-800">
+              <span>Total</span>
+              <span>Rp{total.toLocaleString("id-ID")}</span>
+            </div>
+          </div>
+
+          {/* Submit */}
+          <div className="text-right">
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+            >
+              {loading ? "Processing..." : "Create Transaction"}
+            </button>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

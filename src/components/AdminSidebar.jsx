@@ -1,17 +1,10 @@
 // src/components/AdminSidebar.jsx
 import React, { useState } from 'react';
 import {
-  MdMenuOpen,
-  MdOutlineDashboard,
-  MdLogout,
-  MdExpandLess,
-  MdExpandMore,
+  MdMenuOpen, MdOutlineDashboard, MdLogout,
+  MdExpandLess, MdExpandMore,
 } from 'react-icons/md';
-import {
-  FaProductHunt,
-  FaUserCircle,
-} from 'react-icons/fa';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { FaProductHunt, FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../provider/authProvider';
 
@@ -28,38 +21,12 @@ const AdminSidebar = () => {
     },
     {
       icon: <FaUserCircle size={22} />,
-      label: 'Manajemen User',
-      submenu: [
-        { label: 'Lihat User', to: 'admin/users' },
-        { label: 'Tambah User', to: 'admin/users/add' },
-      ],
+      label: 'Manajemen User', to: 'admin/users'
     },
     {
-          icon: <FaProductHunt size={22} />,
-          label: 'Manajemen Produk',
-          submenu: [
-            { label: 'Lihat Produk', to: 'admin/products' },
-            { label: 'Tambah Produk', to: 'admin/products/add' },
-            { label: 'Edit Produk', to: 'admin/products/edit' },
-          ],
-        },
-        {
-          icon: <FaUserCircle size={22} />,
-          label: 'Manajemen Pelanggan',
-          submenu: [
-            { label: 'Lihat Pelanggan', to: 'admin/customer' },
-            { label: 'Tambah Pelanggan', to: 'admin/customer/add' },
-            { label: 'Edit Pelanggan', to: 'admin/customer/edit' },
-          ],
-        },
-        {
-          icon: <AiOutlineShoppingCart size={22} />,
-          label: 'Manajemen Transaksi',
-          submenu: [
-            { label: 'Lihat Transaksi', to: 'admin/transaction' },
-            { label: 'Tambah Transaksi', to: 'admin/transaction/add' },
-          ],
-        },
+      icon: <FaProductHunt size={22} />,
+      label: 'Manajemen Produk', to: 'admin/products'
+    },
   ];
 
   return (

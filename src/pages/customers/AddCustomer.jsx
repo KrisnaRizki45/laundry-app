@@ -1,28 +1,37 @@
 import React, { useState } from "react";
-import Sidebar from "../../components/EmployeSidebar";
-import useCustomers from "../../hooks/useCustomers";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../lib/axios";
 
 const AddCustomer = () => {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
   const [status, setStatus] = useState("Active");
-  const { createCustomer } = useCustomers();
 
-  const handleSave = (e) => {
+  const navigate = useNavigate();
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    const customerData = { name, phoneNumber, address, status };
-    console.log("Saving customer:", customerData);
-    createCustomer(customerData);
-    // TODO: Kirim data ke backend
+
+    const customerData = {
+      name,
+      phoneNumber,
+      address,
+      status,
+    };
+
+    try {
+      const res = await axiosInstance.post("/customers", customerData);
+      alert("Customer berhasil ditambahkan!");
+      navigate("/employe/customer"); // Ganti dengan rute yang sesuai
+    } catch (error) {
+      console.error("Gagal menyimpan customer:", error);
+      alert("Gagal menyimpan customer. Coba lagi nanti.");
+    }
   };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen font-sans">
-      {/* Sidebar */}
-      {/* <Sidebar className="w-full md:w-64" /> */}
-
-      {/* Konten Form */}
       <main className="flex-1 bg-gray-50 p-6 flex justify-center items-start">
         <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Add Customer</h1>
@@ -41,9 +50,9 @@ const AddCustomer = () => {
               />
             </div>
 
-            {/* Contact */}
+            {/* Phone Number */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Contact (Phone Number)</label>
+              <label className="block text-gray-700 font-medium mb-2">Phone Number</label>
               <input
                 type="text"
                 placeholder="Enter phone number"
@@ -76,7 +85,7 @@ const AddCustomer = () => {
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
-                <option value="Inactive">Pending</option>
+                <option value="Pending">Pending</option>
               </select>
             </div>
 

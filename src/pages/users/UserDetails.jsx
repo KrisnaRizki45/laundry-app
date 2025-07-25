@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 
 const UserDetails = () => {
@@ -7,6 +7,7 @@ const UserDetails = () => {
   const [user, setUser] = useState(null); // state untuk data user
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch data user
   useEffect(() => {
@@ -51,7 +52,6 @@ const UserDetails = () => {
             <InfoRow label="Role" value={user.role || "-"} />
             <InfoRow label="Username" value={user.username || "-"} />
             <InfoRow label="Email" value={user.email || "-"} />
-            <InfoRow label="Address" value={user.address || "-"} /> {/* masih aman meskipun address tidak ada */}
           </div>
         </section>
 
@@ -60,18 +60,19 @@ const UserDetails = () => {
           <h3 className="text-lg font-bold text-[#111518] pb-2">Additional Information</h3>
           <div className="grid grid-cols-[20%_1fr] gap-x-6">
             <InfoRow label="Joined Date" value={formatDate(user.createdAt)} />
-            <InfoRow label="Last Login" value={formatDate(user.updatedAt)} />
+            <InfoRow label="Updated Date" value={formatDate(user.updatedAt)} />
           </div>
         </section>
 
-        {/* Action */}
-        <div className="pt-6 text-right">
-          {/* <Link to={`/admin/users/edit/${user.id}`}>
-            <button className="bg-[#197fe5] hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300">
-              Edit User
-            </button>
-          </Link> */}
-        </div>
+        {/* Back & Submit Buttons in One Row */}
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => navigate("/admin/users")}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 m-1 rounded-lg transition-all duration-300"
+              >
+                Back
+              </button>
+            </div>
       </main>
     </div>
   );

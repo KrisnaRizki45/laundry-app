@@ -6,7 +6,7 @@ const ProductModal = ({ isOpen, onClose, product }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg w-full max-w-md shadow-lg relative">
-        <h2 className="text-xl font-bold mb-4">Detail Produk</h2>
+        <h2 className="text-xl font-bold mb-4 text-white">Detail Produk</h2>
 
         <div className="space-y-2 text-sm text-gray-800 dark:text-gray-200">
           <p><strong>Nama:</strong> {product.name}</p>

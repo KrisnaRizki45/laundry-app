@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 // import Sidebar from "../../components/EmployeSidebar"; // Uncomment if needed
 
@@ -40,11 +40,12 @@ const EditUser = () => {
         username,
         role,
         email,
+        updatedAt: new Date().toISOString(),
       });
       alert("User berhasil diupdate");
       navigate("/admin/users");
     } catch (err) {
-      console.error("Gagal update user:", err);
+      console.error("Gagal update user:", err.response?.data || err.message);
       alert("Terjadi kesalahan saat update");
     } finally {
       setLoading(false);
@@ -60,7 +61,7 @@ const EditUser = () => {
         <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
           {/* Breadcrumb */}
           <div className="text-sm text-gray-500 mb-4">
-            <span className="hover:underline cursor-pointer">Users</span>
+            <Link to="/admin/users"><span className="hover:underline cursor-pointer">Users</span></Link>
             <span className="mx-1">/</span>
             <span className="text-gray-800 font-semibold">Edit User</span>
           </div>
@@ -91,6 +92,18 @@ const EditUser = () => {
             />
           </div>
 
+          {/* Email */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">Email</label>
+            <input
+              type="email"
+              placeholder="Enter email"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          
           {/* Role */}
           <div className="mb-4">
             <label className="block text-gray-700 font-medium mb-2">Role</label>
@@ -103,26 +116,19 @@ const EditUser = () => {
             />
           </div>
 
-          {/* Email */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">Email</label>
-            <input
-              type="email"
-              placeholder="Enter email"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          {/* Back & Submit Buttons in One Row */}
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={() => navigate("/admin/users")}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 m-1 rounded-lg transition-all duration-300"
+            >
+              Back
+            </button>
 
-          
-
-          {/* Submit */}
-          <div className="text-right">
             <button
               onClick={handleUpdate}
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 m-1 rounded-lg transition-all duration-300"
             >
               {loading ? "Updating..." : "Update User"}
             </button>

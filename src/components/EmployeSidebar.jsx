@@ -33,28 +33,17 @@ const EmployeSidebar = () => {
     {
       icon: <FaProductHunt size={22} />,
       label: 'Manajemen Produk',
-      submenu: [
-        { label: 'Lihat Produk', to: 'employe/products' },
-        { label: 'Tambah Produk', to: 'employe/products/add' },
-        { label: 'Edit Produk', to: 'employe/products/edit' },
-      ],
+      to: 'employe/products'
     },
     {
       icon: <FaUserCircle size={22} />,
       label: 'Manajemen Pelanggan',
-      submenu: [
-        { label: 'Lihat Pelanggan', to: 'employe/customer' },
-        { label: 'Tambah Pelanggan', to: 'employe/customer/add' },
-        { label: 'Edit Pelanggan', to: 'employe/customer/edit' },
-      ],
+      to: 'employe/customer'
     },
     {
       icon: <AiOutlineShoppingCart size={22} />,
       label: 'Manajemen Transaksi',
-      submenu: [
-        { label: 'Lihat Transaksi', to: 'employe/transaction' },
-        { label: 'Tambah Transaksi', to: 'employe/transaction/add' },
-      ],
+      to: 'employe/transaction'
     },
   ];
 
